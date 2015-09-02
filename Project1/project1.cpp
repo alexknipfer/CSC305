@@ -28,11 +28,11 @@ class CarClass
 		int listMiles;
 		int listCost;
 		string listDealer;
-		string listVIN;*/
+		string listVIN;
 		
 		string nameDealer;
 		int listZip;
-		string listPhone;
+		string listPhone;*/
 };
 
 //**********************************************************************
@@ -96,6 +96,8 @@ int main()
 	return 0;
 }
 
+//**********************************************************************
+
 void CarClass::addCar(ofstream &carFile)
 {
 	cin >> VIN;
@@ -106,6 +108,8 @@ void CarClass::addCar(ofstream &carFile)
 	carFile << VIN << " " << miles << " " << dealer << " " << cost << endl;
 }
 
+//**********************************************************************
+
 void CarClass::addManufacturer(ofstream &manufacturerFile)
 {
 	cin >> manufacturerAbb;
@@ -113,6 +117,8 @@ void CarClass::addManufacturer(ofstream &manufacturerFile)
 			
 	manufacturerFile << manufacturerAbb << " " << manufacturer << endl;
 }
+
+//**********************************************************************
 
 void CarClass::addDealer(ofstream &dealerFile)
 {
@@ -122,6 +128,8 @@ void CarClass::addDealer(ofstream &dealerFile)
 	
 	dealerFile << dealerName << " " << zipCode << " " << phoneNumber << endl;
 }
+
+//**********************************************************************
 
 void CarClass::listCars(ifstream &myCars)
 {
@@ -138,15 +146,23 @@ void CarClass::listCars(ifstream &myCars)
 	myCars.seekg(0, ios::beg);
 }
 
+//**********************************************************************
+
 void CarClass::listDealers(ifstream &myDealers)
 {
-	myDealers >> nameDealer >> listZip >> listPhone;
+	myDealers >> dealerName >> zipCode >> phoneNumber;
 	
 	while(myDealers.good())
 	{
-		cout << nameDealer << " " << listZip << " " << listPhone << " " << endl;
-		myDealers >> nameDealer >> listZip >> listPhone;
+		cout << dealerName << " " << zipCode << " " << phoneNumber << " " << endl;
+		myDealers >> dealerName >> zipCode >> phoneNumber;
 	}	
+	
+		// Go back and read from top of file
+	myDealers.clear();
+	myDealers.seekg(0, ios::beg);	
 }
+
+//**********************************************************************
 
 

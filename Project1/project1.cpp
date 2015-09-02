@@ -24,10 +24,11 @@ class CarClass
 		int zipCode;
 		string phoneNumber;
 		
+		/*
 		int listMiles;
 		int listCost;
 		string listDealer;
-		string listVIN;
+		string listVIN;*/
 		
 		string nameDealer;
 		int listZip;
@@ -41,8 +42,8 @@ int main()
 	CarClass myCar;
 	
 	ofstream carFile("cars.txt", fstream::app);
-	ofstream manufacturerFile("manufacturer.txt");
-	ofstream dealerFile("dealer.txt");
+	ofstream manufacturerFile("manufacturer.txt", fstream::app);
+	ofstream dealerFile("dealer.txt", fstream::app);
 	
 	ifstream myCars("cars.txt");
 	ifstream myDealers("dealer.txt");
@@ -124,13 +125,17 @@ void CarClass::addDealer(ofstream &dealerFile)
 
 void CarClass::listCars(ifstream &myCars)
 {
-	myCars >> listVIN >> listMiles >> listDealer >> listCost;
+	myCars >> VIN >> miles >> dealer >> cost;
 	
-	while(myCars.good())
+	while(!myCars.eof()) //myCars.good() 
 	{
-		cout << listVIN << " " << listMiles << " " << listDealer << " " << listCost << endl;
-		myCars >> listVIN >> listMiles >> listDealer >> listCost;
-	}	
+		cout << VIN << " " << miles << " " << dealer << " " << cost << endl;
+		myCars >> VIN >> miles >> dealer >> cost;
+	}
+	
+		// Go back and read from top of file
+	myCars.clear();
+	myCars.seekg(0, ios::beg);
 }
 
 void CarClass::listDealers(ifstream &myDealers)

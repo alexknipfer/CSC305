@@ -11,6 +11,8 @@ class CarClass
 		void addCar(ofstream &);
 		void addManufacturer(ofstream &);
 		void addDealer(ofstream &);
+		void listCars(ifstream &);
+		void listDealers(ifstream &);
 	private:
 		string VIN;		// VIN for car
 		string dealer;	// Dealer name
@@ -21,6 +23,15 @@ class CarClass
 		string dealerName;
 		int zipCode;
 		string phoneNumber;
+		
+		int listMiles;
+		int listCost;
+		string listDealer;
+		string listVIN;
+		
+		string nameDealer;
+		int listZip;
+		string listPhone;
 };
 
 //**********************************************************************
@@ -33,6 +44,9 @@ int main()
 	ofstream manufacturerFile("manufacturer.txt");
 	ofstream dealerFile("dealer.txt");
 	
+	ifstream myCars("cars.txt");
+	ifstream myDealers("dealer.txt");
+	
 	
 	char tag;		//add, list, or find
 	char typeToAdd;	// what is being added
@@ -43,20 +57,34 @@ int main()
 	while(tag != 'q')
 	{
 		cin >> typeToAdd;
-		
-		if(typeToAdd == 'c')
+
+		if(tag == 'a')
 		{
-			myCar.addCar(carFile);	
+			switch(typeToAdd)
+			{
+				case 'c':
+					myCar.addCar(carFile);
+					break;
+				case 'm':
+					myCar.addManufacturer(manufacturerFile);
+					break;
+				case 'd':
+					myCar.addDealer(dealerFile);
+					break;
+			}
 		}
 		
-		if(typeToAdd == 'm')
+		if(tag == 'l')
 		{
-			myCar.addManufacturer(manufacturerFile);
-		}
-		
-		if(typeToAdd == 'd')
-		{
-			myCar.addDealer(dealerFile);
+			switch(typeToAdd)
+			{
+				case 'c':
+					myCar.listCars(myCars);
+					break;
+				case 'd':
+					myCar.listDealers(myDealers);
+					break;
+			}
 		}
 		
 		cout << ">>>";
@@ -92,6 +120,28 @@ void CarClass::addDealer(ofstream &dealerFile)
 	cin >> phoneNumber;
 	
 	dealerFile << dealerName << " " << zipCode << " " << phoneNumber << endl;
+}
+
+void CarClass::listCars(ifstream &myCars)
+{
+	myCars >> listVIN >> listMiles >> listDealer >> listCost;
+	
+	while(myCars.good())
+	{
+		cout << listVIN << " " << listMiles << " " << listDealer << " " << listCost << endl;
+		myCars >> listVIN >> listMiles >> listDealer >> listCost;
+	}	
+}
+
+void CarClass::listDealers(ifstream &myDealers)
+{
+	myDealers >> nameDealer >> listZip >> listPhone;
+	
+	while(myDealers.good())
+	{
+		cout << nameDealer << " " << listZip << " " << listPhone << " " << endl;
+		myDealers >> nameDealer >> listZip >> listPhone;
+	}	
 }
 
 

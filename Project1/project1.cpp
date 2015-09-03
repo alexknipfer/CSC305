@@ -13,7 +13,7 @@ class CarClass
 		void addDealer(ofstream &);
 		void listCars(ifstream &);
 		void listDealers(ifstream &);
-		void findManufacturer(ifstream &);
+		void findManufacturer(ifstream &, ifstream &);
 	private:
 			// The following are all information regarding car info
 		string VIN;		
@@ -29,6 +29,8 @@ class CarClass
 		string dealerName;
 		int zipCode;
 		string phoneNumber;
+		
+		string foundManu;
 };
 
 //**********************************************************************
@@ -91,7 +93,7 @@ int main()
 			switch(typeToAdd)
 			{
 				case 'm':
-					myCar.findManufacturer(myManufacturers);
+					myCar.findManufacturer(myManufacturers, myCars);
 					break;
 			}
 		}
@@ -123,7 +125,7 @@ void CarClass::addManufacturer(ofstream &manufacturerFile)
 	cin >> manufacturerAbb;
 	cin >> manufacturer;
 			
-	manufacturerFile << manufacturerAbb << " " << manufacturer << endl;
+	manufacturerFile << manufacturerAbb << manufacturer << endl;
 }
 
 //**********************************************************************
@@ -173,11 +175,11 @@ void CarClass::listDealers(ifstream &myDealers)
 
 //**********************************************************************
 
-void CarClass::findManufacturer(ifstream &myManufacturers)
+void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars)
 {
 	std::string line;
+	std::string carLine;
 	string manu;
-	string foundManu;
 	
 	cin >> manu;
 	
@@ -185,16 +187,24 @@ void CarClass::findManufacturer(ifstream &myManufacturers)
 	{
 		if(line.find(manu) != std::string::npos)
 		{
-			//std::cout << line << std::endl;
-			myManufacturers >> line;
-			foundManu = line;
-			cout << foundManu << endl;
+			foundManu = line.substr(0,3);
+			//cout << foundManu << endl;
+			
+			while(std::getline(myCars, carLine))
+			{
+				if(carLine.find(foundManu) != std::string::npos)
+				{
+					std::cout << carLine << std::endl;
+				}
+			}
 		}
 	}
 	
 		// Go back and read from top of file
 	myManufacturers.clear();
 	myManufacturers.seekg(0, ios::beg);
+	myCars.clear();
+	myCars.seekg(0,ios::beg);
 }
 
 //**********************************************************************

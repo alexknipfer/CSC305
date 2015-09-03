@@ -13,26 +13,22 @@ class CarClass
 		void addDealer(ofstream &);
 		void listCars(ifstream &);
 		void listDealers(ifstream &);
+		void findManufacturer(ifstream &);
 	private:
-		string VIN;		// VIN for car
-		string dealer;	// Dealer name
-		int miles;		//miles car has on it
-		int cost;		//cost of car
-		string manufacturerAbb;		//manufacturer abbreviation
-		string manufacturer;		//manufacturer name
+			// The following are all information regarding car info
+		string VIN;		
+		string dealer;	
+		int miles;		
+		int cost;		
+		
+			// Manufacturer info: abbreviation and name
+		string manufacturerAbb;
+		string manufacturer;
+		
+			// Dealer information
 		string dealerName;
 		int zipCode;
 		string phoneNumber;
-		
-		/*
-		int listMiles;
-		int listCost;
-		string listDealer;
-		string listVIN;
-		
-		string nameDealer;
-		int listZip;
-		string listPhone;*/
 };
 
 //**********************************************************************
@@ -47,6 +43,7 @@ int main()
 	
 	ifstream myCars("cars.txt");
 	ifstream myDealers("dealer.txt");
+	ifstream myManufacturers("manufacturer.txt");
 	
 	
 	char tag;		//add, list, or find
@@ -55,6 +52,7 @@ int main()
 	cout << ">>>";
 	cin >> tag;
 	
+		// continue to ask for input unless the user types "q" then terminate
 	while(tag != 'q')
 	{
 		cin >> typeToAdd;
@@ -84,6 +82,16 @@ int main()
 					break;
 				case 'd':
 					myCar.listDealers(myDealers);
+					break;
+			}
+		}
+		
+		if(tag == 'f')
+		{
+			switch(typeToAdd)
+			{
+				case 'm':
+					myCar.findManufacturer(myManufacturers);
 					break;
 			}
 		}
@@ -165,4 +173,9 @@ void CarClass::listDealers(ifstream &myDealers)
 
 //**********************************************************************
 
+void CarClass::findManufacturer(ifstream &myManufacturers)
+{
+	
+}
 
+//**********************************************************************

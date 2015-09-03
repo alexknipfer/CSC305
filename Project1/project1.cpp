@@ -177,6 +177,7 @@ void CarClass::findManufacturer(ifstream &myManufacturers)
 {
 	std::string line;
 	string manu;
+	string foundManu;
 	
 	cin >> manu;
 	
@@ -184,7 +185,10 @@ void CarClass::findManufacturer(ifstream &myManufacturers)
 	{
 		if(line.find(manu) != std::string::npos)
 		{
-			std::cout << line << std::endl;
+			//std::cout << line << std::endl;
+			myManufacturers >> line;
+			foundManu = line;
+			cout << foundManu << endl;
 		}
 	}
 	

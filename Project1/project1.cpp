@@ -175,7 +175,22 @@ void CarClass::listDealers(ifstream &myDealers)
 
 void CarClass::findManufacturer(ifstream &myManufacturers)
 {
+	std::string line;
+	string manu;
 	
+	cin >> manu;
+	
+	while(std::getline(myManufacturers, line))
+	{
+		if(line.find(manu) != std::string::npos)
+		{
+			std::cout << line << std::endl;
+		}
+	}
+	
+		// Go back and read from top of file
+	myManufacturers.clear();
+	myManufacturers.seekg(0, ios::beg);
 }
 
 //**********************************************************************

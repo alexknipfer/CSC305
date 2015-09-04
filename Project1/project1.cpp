@@ -9,7 +9,7 @@ class CarClass
 {
 	public:
 		void addCar(ofstream &);
-		void addManufacturer(ofstream &);
+		void addManufacturer(ofstream &, ifstream &);
 		void addDealer(ofstream &);
 		void listCars(ifstream &);
 		void listDealers(ifstream &);
@@ -67,7 +67,7 @@ int main()
 					myCar.addCar(carFile);
 					break;
 				case 'm':
-					myCar.addManufacturer(manufacturerFile);
+					myCar.addManufacturer(manufacturerFile, myManufacturers);
 					break;
 				case 'd':
 					myCar.addDealer(dealerFile);
@@ -120,12 +120,15 @@ void CarClass::addCar(ofstream &carFile)
 
 //**********************************************************************
 
-void CarClass::addManufacturer(ofstream &manufacturerFile)
+void CarClass::addManufacturer(ofstream &manufacturerFile, ifstream &myManufacturers)
 {
+	string searchLine;
+	string duplicate;
+	
 	cin >> manufacturerAbb;
 	cin >> manufacturer;
-			
-	manufacturerFile << manufacturerAbb << manufacturer << endl;
+	
+	manufacturerFile << manufacturerAbb << manufacturer << endl;	
 }
 
 //**********************************************************************

@@ -185,10 +185,10 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars)
 	std::string carLine;
 	string manu;
 
-	string delimiter = " ";
-	string token[10000];
-	size_t pos = 0;
-	int x = 0;
+	string delimiter = " ";	//tokenize string after hitting space
+	string token[4];	//Holds each value of the tokenized string
+	size_t pos = 0;	//holds position during string tokenize
+	int x = 0;	//initialize array value
 
 	cin >> manu;
 
@@ -213,7 +213,8 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars)
     					carLine.erase(0, pos + delimiter.length());
 					}
 						//std::cout << carLine << std::endl;
-						cout << token[0] << manu << ": " << token[1] << " miles, "<< " $" << carLine << ": " << endl;
+						cout  << manu << ": " << token[1] << " miles, "<< " $" << carLine << ": " << endl;
+						x = 0;
 				}
 			}
 		}

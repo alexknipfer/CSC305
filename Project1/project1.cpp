@@ -14,7 +14,7 @@ class CarClass
 		void addDealer(ofstream &);
 		void listCars(ifstream &);
 		void listDealers(ifstream &);
-		void findManufacturer(ifstream &, ifstream &);
+		void findManufacturer(ifstream &, ifstream &, ifstream &);
 	private:
 			// The following are all information regarding car info
 		string VIN;
@@ -94,7 +94,7 @@ int main()
 			switch(typeToAdd)
 			{
 				case 'm':
-					myCar.findManufacturer(myManufacturers, myCars);
+					myCar.findManufacturer(myManufacturers, myCars, myDealers);
 					break;
 			}
 		}
@@ -179,11 +179,14 @@ void CarClass::listDealers(ifstream &myDealers)
 
 //**********************************************************************
 
-void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars)
+void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars, ifstream &dealers)
 {
 	std::string line;
 	std::string carLine;
 	string manu;
+
+	std::string dealersLine;
+	string foundDealer;
 
 	string delimiter = " ";	//tokenize string after hitting space
 	string token[4];	//Holds each value of the tokenized string
@@ -202,17 +205,22 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars)
 			{
 				if(carLine.find(foundManu) != std::string::npos)
 				{
-					//std::cout << carLine << std::endl;
-					//token = carLine.substr(0,carLine.find(delimiter));
-					//cout << token << endl;
-
 					while ((pos = carLine.find(delimiter)) != std::string::npos)
 					{
     					token[x++] = carLine.substr(0, pos);
-    					//std::cout << token << std::endl;
     					carLine.erase(0, pos + delimiter.length());
 					}
-						//std::cout << carLine << std::endl;
+
+					while(std::getline(dealers, dealersLine))
+					{
+						if(dealersLine.find(token[2]) != std::string::npos)
+						{
+							foundDealer = dealersLine;
+							cout << foundDealer << endl;
+						}
+					}
+
+						//cout << token[2] << endl;
 						cout  << manu << ": " << token[1] << " miles, "<< " $" << carLine << ": " << endl;
 						x = 0;
 				}

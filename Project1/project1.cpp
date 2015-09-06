@@ -21,6 +21,7 @@ class CarClass
 		string dealer;
 		int miles;
 		int cost;
+		vector<string> myQueue;
 
 			// Manufacturer info: abbreviation and name
 		string manufacturerAbb;
@@ -187,6 +188,9 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars, ifs
 
 	std::string dealersLine;
 	string foundDealer;
+	size_t dealPos = 0;
+	int y = 0;
+	string dealerToken;
 
 	string delimiter = " ";	//tokenize string after hitting space
 	string token[4];	//Holds each value of the tokenized string
@@ -195,7 +199,32 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars, ifs
 
 	cin >> manu;
 
-	while(std::getline(myManufacturers, line))
+	while(getline(myManufacturers, line))
+	{
+		if(line.find(manu) != string::npos)
+		{
+			foundManu = line.substr(0,3);
+		}
+	}
+
+	while(getline(myCars, carLine))
+	{
+		if(carLine.find(foundManu) != string::npos)
+		{
+			while((pos = carLine.find(delimiter)) != string::npos)
+			{
+				token[x++] = carLine.substr(0,pos);
+				carLine.erase(0, pos + delimiter.length());
+			}
+		}
+		cout << token[2] << endl;
+		x = 0;
+	}
+
+
+
+
+	/*while(std::getline(myManufacturers, line))
 	{
 		if(line.find(manu) != std::string::npos)
 		{
@@ -209,24 +238,35 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars, ifs
 					{
     					token[x++] = carLine.substr(0, pos);
     					carLine.erase(0, pos + delimiter.length());
-					}
 
-					while(std::getline(dealers, dealersLine))
-					{
-						if(dealersLine.find(token[2]) != std::string::npos)
-						{
-							foundDealer = dealersLine;
-							cout << foundDealer << endl;
-						}
-					}
 
-						//cout << token[2] << endl;
-						cout  << manu << ": " << token[1] << " miles, "<< " $" << carLine << ": " << endl;
+								//finds dealers in dealer file
+							while(std::getline(dealers, dealersLine))
+							{
+								if(dealersLine.find(token[2]) != std::string::npos)
+								{
+									foundDealer = dealersLine;
+									cout << dealersLine << endl;
+
+									while((dealPos = foundDealer.find(delimiter)) != std::string::npos)
+									{
+										dealerToken = foundDealer.substr(foundDealer.length()-10, foundDealer.length());
+										foundDealer.erase(0, dealPos + delimiter.length());
+										//cout << dealerToken << endl;
+										myQueue.push_back(dealerToken);
+										break;
+									}
+								}
+
+							}
+					}
+						//cout  << manu << ": " << token[1] << " miles, "<< " $" << carLine << ": " << myQueue[dealPos] << endl;
+						myQueue.pop_back();
 						x = 0;
 				}
 			}
 		}
-	}
+	}*/
 
 		// Go back and read from top of file
 	myManufacturers.clear();

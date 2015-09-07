@@ -227,15 +227,14 @@ void CarClass::findManufacturer(ifstream &myManufacturers, ifstream &myCars, ifs
 		if(manuAbb.compare(myVINS[x].substr(0,3)) == 0)
 		{
 			currentVIN = myVINS[x];
-			//cout << currentVIN << endl;
-
 			for(unsigned y = 0; y < myDealers.size(); y++)
 			{
-				if(carsDealers[x].compare(myDealers[y]))
+				if(carsDealers[x].compare(myDealers[y]) ==0 )
 				{
+					string temp = myPhoneNumbers[y];
 					cout << manu << ": " << myMiles[x] << " miles, $" << myCosts[x] << ": "
-					<< carsDealers[x] << "["<< "(" << myPhoneNumbers[x].substr(0,3) << ")" <<
-					myPhoneNumbers[x].substr(3,3) << "-" << myPhoneNumbers[x].substr(6,4) << "]"<< endl;
+					<< carsDealers[x] << "["<< "(" << myPhoneNumbers[y].substr(0,3) << ")" <<
+					myPhoneNumbers[y].substr(3,3) << "-" << myPhoneNumbers[y].substr(6,4) << "]"<< endl;
 					break;
 				}
 			}

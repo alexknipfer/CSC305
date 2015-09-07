@@ -1,8 +1,2 @@
-JHMHonda
-JMOMazda
-KNAKia
-1J4Jeep
-SAJJaguar
-1FAFord
-WBABMW
-DVLSatanic
+HND Honda
+MZD Mazda

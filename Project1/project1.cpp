@@ -15,6 +15,7 @@ class CarClass
 		void listCars(ifstream &);
 		void listDealers(ifstream &);
 		void findManufacturer(ifstream &, ifstream &, ifstream &);
+		void findZipCode(ifstream &, ifstream &, ifstream &);
 		void loadFiles(ifstream &, ifstream &, ifstream &);
 		void clearVectors();
 	private:
@@ -46,7 +47,7 @@ class CarClass
 
 };
 
-//**********************************************************************
+//******************************************************************************
 
 int main()
 {
@@ -87,6 +88,8 @@ int main()
 					myCar.addDealer(dealerFile);
 					break;
 			}
+			myCar.loadFiles(myCars, myManufacturers, myDealers);
+			myCar.clearVectors();
 		}
 
 		if(tag == 'l')
@@ -101,6 +104,7 @@ int main()
 					myCar.listDealers(myDealers);
 					break;
 			}
+			myCar.clearVectors();
 		}
 
 		if(tag == 'f')
@@ -111,9 +115,12 @@ int main()
 				case 'm':
 					myCar.findManufacturer(myManufacturers, myCars, myDealers);
 					break;
+				case 'z':
+					myCar.findZipCode(myManufacturers, myCars, myDealers);
+					break;
 			}
+			myCar.clearVectors();
 		}
-		myCar.clearVectors();
 		cout << ">>>";
 		cin >> tag;
 	}
@@ -121,7 +128,7 @@ int main()
 	return 0;
 }
 
-//**********************************************************************
+//******************************************************************************
 
 void CarClass::addCar(ofstream &carFile)
 {
@@ -130,30 +137,27 @@ void CarClass::addCar(ofstream &carFile)
 	cin >> dealer;
 	cin >> cost;
 
-	myVINS.push_back(VIN);
-	myMiles.push_back(miles);
-	carsDealers.push_back(dealer);
-	myCosts.push_back(cost);
+	//myVINS.push_back(VIN);
+	//myMiles.push_back(miles);
+	//carsDealers.push_back(dealer);
+	//myCosts.push_back(cost);
 
 	carFile << VIN << " " << miles << " " << dealer << " " << cost << endl;
 }
 
-//**********************************************************************
+//******************************************************************************
 
 void CarClass::addManufacturer(ofstream &manufacturerFile, ifstream &myManufacturers)
 {
-	string searchLine;
-	string duplicate;
-
 	cin >> manufacturerAbb;
 	cin >> manufacturer;
 
-	manuAbbreviations.push_back(manufacturerAbb);
-	allManufacturers.push_back(manufacturer);
+	//manuAbbreviations.push_back(manufacturerAbb);
+	//allManufacturers.push_back(manufacturer);
 	manufacturerFile << manufacturerAbb << " " << manufacturer << endl;
 }
 
-//**********************************************************************
+//******************************************************************************
 
 void CarClass::addDealer(ofstream &dealerFile)
 {
@@ -167,9 +171,9 @@ void CarClass::addDealer(ofstream &dealerFile)
 	dealerFile << dealerName << " " << zipCode << " " << phoneNumber << endl;
 }
 
-//**********************************************************************
+//******************************************************************************
 
-void CarClass::listCars(ifstream &myCars)
+void CarClass::listCars(ifstream &cars)
 {
 	/*myCars >> VIN >> miles >> dealer >> cost;
 
@@ -183,28 +187,33 @@ void CarClass::listCars(ifstream &myCars)
 		cout << myVINS[x] << " " << myMiles[x] << " " << carsDealers[x] << " " << myCosts[x] << endl;
 	}
 		// Go back and read from top of file
-	myCars.clear();
-	myCars.seekg(0, ios::beg);
+	//cars.clear();
+	//cars.seekg(0, ios::beg);
 }
 
-//**********************************************************************
+//******************************************************************************
 
-void CarClass::listDealers(ifstream &myDealers)
+void CarClass::listDealers(ifstream &dealers)
 {
-	myDealers >> dealerName >> zipCode >> phoneNumber;
+	/*myDealers >> dealerName >> zipCode >> phoneNumber;
 
 	while(myDealers.good())
 	{
 		cout << dealerName << " " << zipCode << " " << phoneNumber << " " << endl;
 		myDealers >> dealerName >> zipCode >> phoneNumber;
+	}*/
+
+	for(unsigned x = 0; x < myDealers.size(); x++)
+	{
+		cout << myDealers[x] << " " << myZipCodes[x] << " " << myPhoneNumbers[x] << endl;
 	}
 
 		// Go back and read from top of file
-	myDealers.clear();
-	myDealers.seekg(0, ios::beg);
+	dealers.clear();
+	dealers.seekg(0, ios::beg);
 }
 
-//**********************************************************************
+//******************************************************************************
 
 void CarClass::findManufacturer(ifstream &manufacturers, ifstream &cars, ifstream &dealers)
 {
@@ -249,7 +258,49 @@ void CarClass::findManufacturer(ifstream &manufacturers, ifstream &cars, ifstrea
 	dealers.seekg(0, ios::beg);
 }
 
-//**********************************************************************
+//******************************************************************************
+
+void CarClass::findZipCode(ifstream &manufacturers, ifstream &cars, ifstream &dealers)
+{
+	int currentZip;
+	string currentDealer;
+	string currentCar;
+	string currentManufacturer;
+
+	cin >> currentZip;
+
+	for(unsigned x = 0; x < myZipCodes.size(); x++)
+	{
+		if(currentZip == myZipCodes[x])
+		{
+			currentDealer = myDealers[x];
+			for(unsigned y = 0; y < carsDealers.size(); y++)
+			{
+				if(currentDealer.compare(carsDealers[y]) == 0)
+				{
+					for(unsigned z = 0; z < manuAbbreviations.size(); z++)
+					{
+						if(manuAbbreviations[z].compare(myVINS[y].substr(0,3)) == 0)
+						{
+							cout << allManufacturers[z] << ": " << myMiles[y] << " miles, $" << myCosts[y] <<
+							" " << currentDealer << "["<< "(" << myPhoneNumbers[x].substr(0,3) << ")" <<
+							myPhoneNumbers[x].substr(3,3) << "-" << myPhoneNumbers[x].substr(6,4) << "]"<< endl;
+						}
+					}
+					//cout << myMiles[y] << " " << myCosts[y] << " " << currentDealer << endl;
+				}
+			}
+		}
+	}
+	manufacturers.clear();
+	manufacturers.seekg(0, ios::beg);
+
+	cars.clear();
+	cars.seekg(0, ios::beg);
+
+	dealers.clear();
+	dealers.seekg(0, ios::beg);
+}
 
 void CarClass::loadFiles(ifstream &cars, ifstream &manufacturers, ifstream &dealers)
 {
@@ -287,6 +338,8 @@ void CarClass::loadFiles(ifstream &cars, ifstream &manufacturers, ifstream &deal
 	}
 	cout <<"loaded" <<endl;
 }
+
+//******************************************************************************
 
 void CarClass::clearVectors()
 {

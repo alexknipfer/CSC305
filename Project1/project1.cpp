@@ -61,7 +61,7 @@ int main()
 	ifstream myDealers("dealer.txt");
 	ifstream myManufacturers("manufacturer.txt");
 
-	myCar.loadFiles(myCars, myManufacturers, myDealers);
+	//myCar.loadFiles(myCars, myManufacturers, myDealers);
 
 	char tag;		//add, list, or find
 	char typeToAdd;	// what is being added
@@ -72,6 +72,8 @@ int main()
 		// continue to ask for input unless the user types "q" then terminate
 	while(tag != 'q')
 	{
+		myCar.loadFiles(myCars, myManufacturers, myDealers);
+
 		cin >> typeToAdd;
 
 		if(tag == 'a')
@@ -88,13 +90,13 @@ int main()
 					myCar.addDealer(dealerFile);
 					break;
 			}
-			myCar.loadFiles(myCars, myManufacturers, myDealers);
-			myCar.clearVectors();
+			//myCar.loadFiles(myCars, myManufacturers, myDealers);
+			//myCar.clearVectors();
 		}
 
 		if(tag == 'l')
 		{
-			myCar.loadFiles(myCars, myManufacturers, myDealers);
+			//myCar.loadFiles(myCars, myManufacturers, myDealers);
 			switch(typeToAdd)
 			{
 				case 'c':
@@ -104,12 +106,12 @@ int main()
 					myCar.listDealers(myDealers);
 					break;
 			}
-			myCar.clearVectors();
+		//	myCar.clearVectors();
 		}
 
 		if(tag == 'f')
 		{
-			myCar.loadFiles(myCars, myManufacturers, myDealers);
+			//myCar.loadFiles(myCars, myManufacturers, myDealers);
 			switch(typeToAdd)
 			{
 				case 'm':
@@ -119,12 +121,13 @@ int main()
 					myCar.findZipCode(myManufacturers, myCars, myDealers);
 					break;
 			}
-			myCar.clearVectors();
+		//	myCar.clearVectors();
 		}
+
 		cout << ">>>";
 		cin >> tag;
+		myCar.clearVectors();
 	}
-
 	return 0;
 }
 
@@ -175,42 +178,47 @@ void CarClass::addDealer(ofstream &dealerFile)
 
 void CarClass::listCars(ifstream &cars)
 {
-	/*myCars >> VIN >> miles >> dealer >> cost;
+	cars.clear();
+	cars.seekg(0, ios::beg);
+	cars >> VIN >> miles >> dealer >> cost;
 
-	while(myCars.good())
+	while(cars.good())
 	{
 		cout << VIN << " " << miles << " " << dealer << " " << cost << endl;
-		myCars >> VIN >> miles >> dealer >> cost;
-	}*/
-	for(unsigned x = 0; x < myVINS.size(); x++)
-	{
-		cout << myVINS[x] << " " << myMiles[x] << " " << carsDealers[x] << " " << myCosts[x] << endl;
+		cars >> VIN >> miles >> dealer >> cost;
 	}
+	/*for(unsigned x = 0; x < myVINS.size(); x++)
+	{
+		cout << "hello";
+
+		//cout << myVINS[x] << " " << myMiles[x] << " " << carsDealers[x] << " " << myCosts[x] << endl;
+	}*/
 		// Go back and read from top of file
-	//cars.clear();
-	//cars.seekg(0, ios::beg);
+
 }
 
 //******************************************************************************
 
 void CarClass::listDealers(ifstream &dealers)
 {
-	/*myDealers >> dealerName >> zipCode >> phoneNumber;
-
-	while(myDealers.good())
-	{
-		cout << dealerName << " " << zipCode << " " << phoneNumber << " " << endl;
-		myDealers >> dealerName >> zipCode >> phoneNumber;
-	}*/
-
-	for(unsigned x = 0; x < myDealers.size(); x++)
-	{
-		cout << myDealers[x] << " " << myZipCodes[x] << " " << myPhoneNumbers[x] << endl;
-	}
-
-		// Go back and read from top of file
+	// Go back and read from top of file
 	dealers.clear();
 	dealers.seekg(0, ios::beg);
+
+	dealers >> dealerName >> zipCode >> phoneNumber;
+
+	while(dealers.good())
+	{
+		cout << dealerName << " " << zipCode << " " << phoneNumber << " " << endl;
+		dealers >> dealerName >> zipCode >> phoneNumber;
+	}
+
+	/*for(unsigned x = 0; x < myDealers.size(); x++)
+	{
+		cout << myDealers[x] << " " << myZipCodes[x] << " " << myPhoneNumbers[x] << endl;
+	}*/
+
+
 }
 
 //******************************************************************************
@@ -219,9 +227,22 @@ void CarClass::findManufacturer(ifstream &manufacturers, ifstream &cars, ifstrea
 {
 	string manu;
 	string manuAbb;
-	string currentVIN;
+
+	manufacturers.clear();
+	manufacturers.seekg(0, ios::beg);
+
+	cars.clear();
+	cars.seekg(0, ios::beg);
+
+	dealers.clear();
+	dealers.seekg(0, ios::beg);
 
 	cin >> manu;
+
+	/*for(unsigned int x = 0; x < myVINS.size(); x++)
+	{
+		cout << myVINS[x] << endl;
+	}*/
 	for(unsigned int x = 0; x < allManufacturers.size(); x++)
 	{
 		if(manu.compare(allManufacturers[x]) == 0)
@@ -230,12 +251,11 @@ void CarClass::findManufacturer(ifstream &manufacturers, ifstream &cars, ifstrea
 		}
 	}
 
-	for(unsigned x = 0; x < myVINS.size(); x++)
+	for(unsigned int x = 0; x < myVINS.size(); x++)
 	{
 		if(manuAbb.compare(myVINS[x].substr(0,3)) == 0)
 		{
-			currentVIN = myVINS[x];
-			for(unsigned y = 0; y < myDealers.size(); y++)
+			for(unsigned int y = 0; y < myDealers.size(); y++)
 			{
 				if(carsDealers[x].compare(myDealers[y]) == 0)
 				{
@@ -248,14 +268,6 @@ void CarClass::findManufacturer(ifstream &manufacturers, ifstream &cars, ifstrea
 			}
 		}
 	}
-	manufacturers.clear();
-	manufacturers.seekg(0, ios::beg);
-
-	cars.clear();
-	cars.seekg(0, ios::beg);
-
-	dealers.clear();
-	dealers.seekg(0, ios::beg);
 }
 
 //******************************************************************************
@@ -287,7 +299,6 @@ void CarClass::findZipCode(ifstream &manufacturers, ifstream &cars, ifstream &de
 							myPhoneNumbers[x].substr(3,3) << "-" << myPhoneNumbers[x].substr(6,4) << "]"<< endl;
 						}
 					}
-					//cout << myMiles[y] << " " << myCosts[y] << " " << currentDealer << endl;
 				}
 			}
 		}
@@ -315,6 +326,15 @@ void CarClass::loadFiles(ifstream &cars, ifstream &manufacturers, ifstream &deal
 	string loadDealer;
 	int loadZip;
 	string loadPhone;
+
+	manufacturers.clear();
+	manufacturers.seekg(0, ios::beg);
+
+	cars.clear();
+	cars.seekg(0, ios::beg);
+
+	dealers.clear();
+	dealers.seekg(0, ios::beg);
 
 	while(cars >> loadVIN >> loadMiles >> loadDealers >> loadCost)
 	{

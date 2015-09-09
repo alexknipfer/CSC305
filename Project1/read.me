@@ -1,15 +1,29 @@
 NAME: Alex L Knipfer
+=============================================
 
-DATE: 
+DATE [DUE]: Thursday, September 10 2015
 
 PLATFORM: Linux [Distribution: Manjaro (ARCH Based)] / Mac OSX
 
 IDE: Geany 1.25 & Atom (atom.io)
 
-Current Bugs: Sometimes when running the program in two instances you have to type
-the command twice in order for it to show. For example, if you add data in one instance,
-then try to list in the other instance, you have to type “l” “c” twice in order to get 
-the listed data
+
+**********************************************
+
+Bugs:
+Have to type list commands and find commands twice to get output [fixed]
+Adding a very large number for car miles causes the whole program to crash
+
+**********************************************
+Error Checks: 
+- Always have to add dealers and manufacturers before adding cars or else you will 
+  receive an error
+- You can’t add the same dealer name twice, you will receive an error
+- When adding manufacturers, you can’t reuse the manufacturer name or abbreviation
+
+**********************************************
+Approach: 
+Before starting I drew out everything on paper I needed to keep track of throughout the program. I then figured out the easiest way to store the data into files. I decided to store them into three different file (manufacturers, cars, car dealers). All went smoothly until I got to the “find” part of the program. I attempted several different ways on searching files by finding a string in a line then returning the whole line (after trying for 2 days), that wasn’t the right approach. That’s when I decided to use vectors to keep all information for everything organized in parallel. Vectors were easy to insert and remove data when needed. That’s when I created to functions for loading vectors and clearing vectors. This allows two instances of the program to run and still be able to retrieve data from both instances. Every time the program runs it automatically loads vectors by pulling the data from the files.
 
 ****************** CHANGELOG *******************
 
@@ -52,3 +66,8 @@ Listing, adding, finding all work (can’t find zip code yet) except for the cur
 
 ———————— Tue, Sep 8 ————————
 Now can find all cars based on zip code 
+Finally fixed the bug of having to type find twice, it was not reading from the top of the file
+————————— Wed, Sep 9 ———————
+Error checks added, add manufacturer and dealers always before cars
+
+Can’t add duplicate dealers or duplicate manufacturers!

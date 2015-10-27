@@ -9,6 +9,7 @@ using namespace std;
 
 string myget_passwd();
 char mygetch();
+int buildMyTables(MYSQL &, MYSQL *);
 
 
 int main()
@@ -29,16 +30,21 @@ int main()
 	cout.flush();
 	mysql_init(&mysql);
 	cout << "Done!" << endl;
+	
+	db_host = "0.0.0.0";
+	db_user = "alexknipfer";
+	db_password = "";
+	db_name = "alexknipfer";
 
 		//get user credentials and mysql server info
-	cout << "Enter MySQL database hostname (or IP adress):";
+	/*cout << "Enter MySQL database hostname (or IP adress):";
 	cin >> db_host;
 
 	cout << "Enter MySQL database username (also the database name):";
 	cin >> db_user;
 
 	cout << "Enter MySQL database password:";
-	db_password=myget_passwd();
+	db_password=myget_passwd();*/
 
 		//could also prompt for this, if desired
 	db_name = db_user;
@@ -60,8 +66,14 @@ int main()
 	}
 	
 	else
+	{
 		cout << "DB connection established" << endl;
-
+	}
+	
+		//build tables
+	buildMyTables(mysql, conn);
+		
+	
 
 		//clean up the connection
 	mysql_close(conn);
@@ -70,7 +82,7 @@ int main()
 	return 0;
 }
 
-//********************************************************************//
+//******************************************************************************
 
 char mygetch()
 {
@@ -97,7 +109,7 @@ char mygetch()
   return ch;
 }
 
-//********************************************************************//
+//******************************************************************************
 
 string myget_passwd()
 {
@@ -147,5 +159,55 @@ string myget_passwd()
 	return passwd;
 }
 
-//********************************************************************//
+//******************************************************************************
+
+int buildMyTables(MYSQL &mysql, MYSQL *conn)
+{
+	string carTable;	//car table
+	string manuTable;	//manufacuter table
+	string dealerTable;	//dealer table
+	
+	int carQuery;
+	int manuQuery;
+	int dealerQuery;
+
+	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), year integer, primary key(vin))";
+	cout.flush();
+	carQuery = mysql_query(conn, carTable.c_str());
+	
+	// if the query didn't work ...
+	if (carQuery!=0)
+	{
+		// ... explain why ...
+		cout << "ERROR" << endl;
+		return 1;  // ... and exit program
+	}
+		
+	manuTable  = "create table if not exists manuTable (manuAbb char(3), manu char(50), primary key(manuAbb))";
+	cout.flush();
+	manuQuery = mysql_query(conn, manuTable.c_str());
+	
+		// if the query didn't work ...
+	if (manuQuery!=0)
+	{
+		// ... explain why ...
+		cout << "ERROR" << endl;
+		return 1;  // ... and exit program
+	}
+	
+	dealerTable  = "create table if not exists dealerTable (dealerName char(50), zipCode integer, phoneNumber char(10), primary key(dealerName))";
+	cout.flush();
+	dealerQuery = mysql_query(conn, dealerTable.c_str());
+	
+		// if the query didn't work ...
+	if (dealerQuery!=0)
+	{
+		// ... explain why ...
+		cout << "ERROR" << endl;
+		return 1;  // ... and exit program
+	}	
+	
+	
+	return 0;
+}
 

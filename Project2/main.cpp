@@ -9,7 +9,9 @@ using namespace std;
 
 string myget_passwd();
 char mygetch();
+
 int buildMyTables(MYSQL &, MYSQL *);
+void addCar(MYSQL &, MYSQL *);
 
 
 int main()
@@ -93,8 +95,7 @@ int main()
 			{
 					//add car if type entered was 'c'
 				case 'c':
-					//addCar();
-					cout << "add car" << endl;
+					addCar(mysql, conn);
 					break;
 					
 					//add manufacturer if type entered was 'm'
@@ -250,7 +251,7 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	int manuQuery;
 	int dealerQuery;
 
-	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), year integer, primary key(vin))";
+	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), cost integer, primary key(vin))";
 	cout.flush();
 	carQuery = mysql_query(conn, carTable.c_str());
 	
@@ -258,7 +259,7 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	if (carQuery!=0)
 	{
 		// ... explain why ...
-		cout << "ERROR" << endl;
+		cout << mysql_error(&mysql) << endl;
 		return 1;  // ... and exit program
 	}
 		
@@ -270,7 +271,7 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	if (manuQuery!=0)
 	{
 		// ... explain why ...
-		cout << "ERROR" << endl;
+		cout << mysql_error(&mysql) << endl;
 		return 1;  // ... and exit program
 	}
 	
@@ -282,11 +283,27 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	if (dealerQuery!=0)
 	{
 		// ... explain why ...
-		cout << "ERROR" << endl;
+		cout << mysql_error(&mysql) << endl;
 		return 1;  // ... and exit program
 	}	
 	
 	
 	return 0;
+}
+
+//******************************************************************************
+
+void addCar(MYSQL &mysql, MYSQL *conn)
+{
+	string VIN;
+	int miles;
+	string dealer;
+	int cost;
+	
+	cin >> VIN;
+	cin >> miles;
+	cin >> dealer;
+	cin >> cost;
+	
 }
 

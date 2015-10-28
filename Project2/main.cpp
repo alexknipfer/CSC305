@@ -70,11 +70,90 @@ int main()
 		cout << "DB connection established" << endl;
 	}
 	
-		//build tables
-	buildMyTables(mysql, conn);
-		
+	char tag;			//reads in "a", "l", or "f"
+	char typeToAdd;		//determines what to add, list, or find
 	
-
+		//build 3 tables (cars, dealers, manufacturers)
+	buildMyTables(mysql, conn);
+	
+	cout << ">>>";		//indicates for user to input
+	cin >> tag;			//read in add, list, or find (a, l, or f)
+	
+		//continue to ask for input unless the user types a "q" then terminate
+	while(tag != 'q')
+	{
+			//reads in what to add (car, dealer, or manufacturer)
+		cin >> typeToAdd;
+		
+			//add something if tag is 'a'
+		if(tag == 'a')
+		{
+				//determine what to add based on what user entered
+			switch(typeToAdd)
+			{
+					//add car if type entered was 'c'
+				case 'c':
+					//addCar();
+					cout << "add car" << endl;
+					break;
+					
+					//add manufacturer if type entered was 'm'
+				case 'm':
+					//addManufacturer();
+					cout << "add manufacturer" << endl;
+					break;
+					
+					//add dealer if type entered was 'd'
+				case 'd':
+					//addDealer();
+					cout << "add dealer" << endl;
+					break;
+			}
+		}
+		
+			//list something if tag is 'l'
+		if(tag == 'l')
+		{
+				//determine what to list based on what user entered
+			switch(typeToAdd)
+			{
+					//list cars if type entered was 'c'
+				case 'c':
+					//listCars();
+					cout << "list cars" << endl;
+					break;
+					
+					//list dealers if type entered was 'd'
+				case 'd':
+					//listDealers();
+					cout << "list dealers" << endl;
+					break;
+			}
+		}
+		
+			//find something if tag is 'f'
+		if(tag == 'f')
+		{
+				//determine what to find based on what user entered
+			switch(typeToAdd)
+			{
+					//find manufacturer if type entered was 'm'
+				case 'm':
+					//findManufacturer();
+					cout << "find manufacturers" << endl;
+					break;
+			}
+		}
+		
+			//prompt for user input again
+		cout << ">>>";
+		cin >> tag;
+	}
+	
+	
+	
+	
+	
 		//clean up the connection
 	mysql_close(conn);
 

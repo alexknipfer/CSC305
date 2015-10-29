@@ -14,6 +14,8 @@ int buildMyTables(MYSQL &, MYSQL *);
 void addCar(MYSQL &, MYSQL *, MYSQL_RES *, MYSQL_RES *);
 void addManufacturer(MYSQL &, MYSQL *);
 void addDealer(MYSQL &, MYSQL *);
+void listCars(MYSQL &, MYSQL *, MYSQL_RES *);
+void listDealers(MYSQL &, MYSQL *, MYSQL_RES *);
 
 
 int main()
@@ -122,14 +124,12 @@ int main()
 			{
 					//list cars if type entered was 'c'
 				case 'c':
-					//listCars();
-					cout << "list cars" << endl;
+					listCars(mysql, conn, res);
 					break;
 					
 					//list dealers if type entered was 'd'
 				case 'd':
-					//listDealers();
-					cout << "list dealers" << endl;
+					listDealers(mysql, conn, res);
 					break;
 			}
 		}
@@ -421,6 +421,9 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 		}
 	}
 	
+	mysql_free_result(res);
+	mysql_free_result(res2);
+	
 	/*else
 	{
 			//go through each line (row) of the answer table
@@ -502,7 +505,71 @@ void addDealer(MYSQL &mysql, MYSQL *conn)
 		cout << mysql_error(&mysql) << endl;
 		return;  // ... and exit program
 	}
+}
+
+void listCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
+{
+	string allCars;
+	int allCarsQuery;
+	MYSQL_ROW row;
 	
+	allCars = "select * from carTable;";
+	allCarsQuery = mysql_query(conn,allCars.c_str());
 	
+	res = mysql_store_result(conn);
+
+		//if the query didn't work ...
+	if (allCarsQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}
+	
+	// go through each line (row) of the answer table
+	for(row=mysql_fetch_row(res);
+		row!=NULL;
+		row=mysql_fetch_row(res))
+	{
+		// print out the first 2 colums; they are stored in
+		//    an "array-like" manner
+		cout << row[0] << "  " << row[1] << " " << row[2] << " " << row[3] << endl;
+	}
+	
+	mysql_free_result(res);
+}
+
+void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
+{
+	string allDealers;
+	int allDealersQuery;
+	MYSQL_ROW row;
+	
+	allDealers = "select * from dealerTable;";
+	allDealersQuery = mysql_query(conn, allDealers.c_str());
+	
+	res = mysql_store_result(conn);
+	
+		//if the query didn't work ...
+	if (allDealersQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}
+	
+	// go through each line (row) of the answer table
+	for(row=mysql_fetch_row(res);
+		row!=NULL;
+		row=mysql_fetch_row(res))
+	{
+		// print out the first 2 colums; they are stored in
+		//    an "array-like" manner
+		cout << row[0] << "  " << row[1] << " " << row[2]  << endl;
+	}
+	
+	mysql_free_result(res);
 }
 

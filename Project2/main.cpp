@@ -11,7 +11,9 @@ string myget_passwd();
 char mygetch();
 
 int buildMyTables(MYSQL &, MYSQL *);
-void addCar(MYSQL &, MYSQL *);
+void addCar(MYSQL &, MYSQL *, MYSQL_RES *, MYSQL_RES *);
+void addManufacturer(MYSQL &, MYSQL *);
+void addDealer(MYSQL &, MYSQL *);
 
 
 int main()
@@ -20,6 +22,8 @@ int main()
 	MYSQL *conn, // actual mysql connection
 		mysql;   // local mysql data
 	MYSQL_RES *res; // mysql query results
+	MYSQL_RES *res2;
+	MYSQL_ROW row;
 
 		//Strings for mysql hostname, userid, ...
 	string db_host;
@@ -95,19 +99,17 @@ int main()
 			{
 					//add car if type entered was 'c'
 				case 'c':
-					addCar(mysql, conn);
+					addCar(mysql, conn, res, res2);
 					break;
 					
 					//add manufacturer if type entered was 'm'
 				case 'm':
-					//addManufacturer();
-					cout << "add manufacturer" << endl;
+					addManufacturer(mysql, conn);
 					break;
 					
 					//add dealer if type entered was 'd'
 				case 'd':
-					//addDealer();
-					cout << "add dealer" << endl;
+					addDealer(mysql, conn);
 					break;
 			}
 		}
@@ -247,12 +249,15 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	string manuTable;	//manufacuter table
 	string dealerTable;	//dealer table
 	
-	int carQuery;
-	int manuQuery;
-	int dealerQuery;
+	int carQuery;		//store query for creating car table
+	int manuQuery;		//store manufacturer query for creating manufacturer table
+	int dealerQuery;	//store dealer query for creating dealer table
 
+		//create "query" for creating a car table
 	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), cost integer, primary key(vin))";
 	cout.flush();
+	
+		//store query into carQuery
 	carQuery = mysql_query(conn, carTable.c_str());
 	
 	// if the query didn't work ...
@@ -262,9 +267,12 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 		cout << mysql_error(&mysql) << endl;
 		return 1;  // ... and exit program
 	}
-		
+	
+		//create "query" for creating manufacturer table	
 	manuTable  = "create table if not exists manuTable (manuAbb char(3), manu char(50), primary key(manuAbb))";
 	cout.flush();
+	
+		//store query into manuQuery
 	manuQuery = mysql_query(conn, manuTable.c_str());
 	
 		// if the query didn't work ...
@@ -275,8 +283,11 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 		return 1;  // ... and exit program
 	}
 	
+		//create "query" for creating dealer table
 	dealerTable  = "create table if not exists dealerTable (dealerName char(50), zipCode integer, phoneNumber char(10), primary key(dealerName))";
 	cout.flush();
+	
+		//store query into dealerQuery
 	dealerQuery = mysql_query(conn, dealerTable.c_str());
 	
 		// if the query didn't work ...
@@ -287,23 +298,193 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 		return 1;  // ... and exit program
 	}	
 	
-	
 	return 0;
 }
 
 //******************************************************************************
 
-void addCar(MYSQL &mysql, MYSQL *conn)
+void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 {
-	string VIN;
-	int miles;
-	string dealer;
-	int cost;
+		//This function adds a car to the car table given
+		//a VIN, mileage, dealer, and cost from user
+		
+		
+	string carVIN;			//car VIN number
+	string carMiles;			//car mileage
+	string carDealer;		//car dealer
+	string carCost;			//car cost
+	string manuAbbreviation; //manufacturer from VIN
 	
-	cin >> VIN;
-	cin >> miles;
-	cin >> dealer;
-	cin >> cost;
+	string addCarInsert;
+	int addCarQuery;
+	
+	MYSQL_ROW row;
+	
+		//read in VIN, miles, dealer, and cost from user
+	cin >> carVIN;			
+	cin >> carMiles;
+	cin >> carDealer;
+	cin >> carCost;
+	
+	
+	manuAbbreviation = carVIN.substr(0,3);
+	
+	//***** The following selects dealers from dealer table *******************/
+	string dealersQuery = "select dealerName from dealerTable;";
+	
+	int dealerQuery = mysql_query(conn, dealersQuery.c_str());
+			//get the query result(s)
+	res = mysql_store_result(conn);
+	int totalRowsDealer = mysql_num_rows(res);
+	
+		//if the query didn't work ...
+	if (dealerQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}
+	
+	//************* The following selects manu abbreviations from manuTable****/
+	string manuQuery = "select manuAbb from manuTable;";
+	int manufacturerQuery = mysql_query(conn,manuQuery.c_str());
+	res2 = mysql_store_result(conn);
+	int totalRowsManu = mysql_num_rows(res2);
+	
+	if (manufacturerQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}
+	//*************************************************************************/
+
+	if (totalRowsDealer == 0 && totalRowsManu == 0)
+	{
+		cout << "Please add a dealer and manufacturer before adding a car" << endl;	
+	}
+	
+	else if(totalRowsDealer == 0)
+	{
+		cout << "Please add a dealer first, dealer doesn't exist" << endl;
+	}
+	
+	else if(totalRowsManu == 0)
+	{
+		cout << "Please add manufacturer first, doesn't exist" << endl;
+	}
+	
+	else
+	{
+			//go through each line (row) of the answer table
+		for(row=mysql_fetch_row(res);
+		row!=NULL;
+		row=mysql_fetch_row(res))
+		{
+			if(row[0] == carDealer)
+			{
+				addCarInsert = "insert into carTable values(\"";
+				addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost + "\")";
+		
+				addCarQuery = mysql_query(conn, addCarInsert.c_str());
+	
+					// if the query didn't work ...
+				if (addCarQuery != 0)
+				{
+						// ... explain why ...
+					cout << mysql_error(&mysql) << endl;
+					return;  // ... and exit program
+				}		
+			}
+		
+			else
+			{
+				cout << "Please add dealer first" << endl;
+			}
+		}
+		
+					//go through each line (row) of the answer table
+		/*for(row=mysql_fetch_row(res2);
+		row!=NULL;
+		row=mysql_fetch_row(res2))
+		{
+			if(row[0] == manuAbbreviation)
+			{
+				addCarInsert = "insert into carTable values(\"";
+				addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost + "\")";
+		
+				addCarQuery = mysql_query(conn, addCarInsert.c_str());
+	
+					// if the query didn't work ...
+				if (addCarQuery != 0)
+				{
+						// ... explain why ...
+					cout << mysql_error(&mysql) << endl;
+					return;  // ... and exit program
+				}		
+			}
+		
+			else
+			{
+				cout << "Please add manufacturer first" << endl;
+			}
+		}*/
+	}
+}
+
+void addManufacturer(MYSQL &mysql, MYSQL *conn)
+{
+	string abbreviation;
+	string manuName;
+	
+	string addManuInsert;
+	int addManuQuery;
+	
+	cin >> abbreviation;
+	cin >> manuName;
+	
+	addManuInsert = "insert into manuTable values(\"";
+	addManuInsert += abbreviation + "\"," + "\"" + manuName + "\")";
+	
+	addManuQuery = mysql_query(conn, addManuInsert.c_str());
+	
+		// if the query didn't work ...
+	if (addManuQuery != 0)
+	{
+		// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		return;  // ... and exit program
+	}
+}
+
+void addDealer(MYSQL &mysql, MYSQL *conn)
+{
+	string dealerName;
+	string dealerZip;
+	string dealerPhone;
+	
+	string addDealerInsert;
+	int addDealerQuery;
+	
+	cin >> dealerName;
+	cin >> dealerZip;
+	cin >> dealerPhone;
+	
+	addDealerInsert = "insert into dealerTable values(\"";
+	addDealerInsert += dealerName + "\"," + "\"" + dealerZip + "\"," + "\"" + dealerPhone + "\")";
+	
+	addDealerQuery = mysql_query(conn, addDealerInsert.c_str());
+	
+		// if the query didn't work ...
+	if (addDealerQuery != 0)
+	{
+		// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		return;  // ... and exit program
+	}
+	
 	
 }
 

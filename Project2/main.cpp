@@ -319,6 +319,7 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	int addCarQuery;
 	
 	MYSQL_ROW row;
+	MYSQL_ROW manuRow;
 	
 		//read in VIN, miles, dealer, and cost from user
 	cin >> carVIN;			
@@ -330,8 +331,23 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	manuAbbreviation = carVIN.substr(0,3);
 	
 	//***** The following selects dealers from dealer table *******************/
-	string dealersQuery = "select dealerName from dealerTable;";
+	/*string dealersQuery = "select dealerName from dealerTable;";
 	
+	int dealerQuery = mysql_query(conn, dealersQuery.c_str());
+			//get the query result(s)
+	res = mysql_store_result(conn);
+	int totalRowsDealer = mysql_num_rows(res);
+	
+		//if the query didn't work ...
+	if (dealerQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}*/
+	
+	string dealersQuery = "select dealerName from dealerTable where dealerName = '"  + carDealer + "\';";
 	int dealerQuery = mysql_query(conn, dealersQuery.c_str());
 			//get the query result(s)
 	res = mysql_store_result(conn);
@@ -347,10 +363,12 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	}
 	
 	//************* The following selects manu abbreviations from manuTable****/
-	string manuQuery = "select manuAbb from manuTable;";
+	string manuQuery = "select manuAbb from manuTable where manuAbb =  '" + manuAbbreviation + "\';";
+
 	int manufacturerQuery = mysql_query(conn,manuQuery.c_str());
 	res2 = mysql_store_result(conn);
 	int totalRowsManu = mysql_num_rows(res2);
+	manuRow = mysql_fetch_row(res2);
 	
 	if (manufacturerQuery !=0)
 	{
@@ -359,6 +377,7 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 		
 		return;  // ... and exit program
 	}
+	
 	//*************************************************************************/
 
 	if (totalRowsDealer == 0 && totalRowsManu == 0)
@@ -376,14 +395,40 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 		cout << "Please add manufacturer first, doesn't exist" << endl;
 	}
 	
-	else
+	else if(totalRowsDealer > 0 && totalRowsManu == 0)
+	{
+		cout << "Please add a manufacturer first" <<endl;
+	}
+	
+	else if(totalRowsDealer ==0 && totalRowsManu > 0)
+	{
+		cout << "Please add a dealer first" << endl;
+	}
+	
+	else if(totalRowsDealer > 0 && totalRowsManu > 0)
+	{
+		addCarInsert = "insert into carTable values(\"";
+		addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost + "\")";
+		
+		addCarQuery = mysql_query(conn, addCarInsert.c_str());
+	
+			// if the query didn't work ...
+		if (addCarQuery != 0)
+		{
+				// ... explain why ...
+			cout << mysql_error(&mysql) << endl;
+			return;  // ... and exit program
+		}
+	}
+	
+	/*else
 	{
 			//go through each line (row) of the answer table
 		for(row=mysql_fetch_row(res);
 		row!=NULL;
 		row=mysql_fetch_row(res))
 		{
-			if(row[0] == carDealer)
+			if(row[0] == carDealer && totalRowsManu > 0)
 			{
 				addCarInsert = "insert into carTable values(\"";
 				addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost + "\")";
@@ -401,37 +446,10 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 		
 			else
 			{
-				cout << "Please add dealer first" << endl;
+				cout << "Please add dealer and manufacturer first" << endl;
 			}
 		}
-		
-					//go through each line (row) of the answer table
-		/*for(row=mysql_fetch_row(res2);
-		row!=NULL;
-		row=mysql_fetch_row(res2))
-		{
-			if(row[0] == manuAbbreviation)
-			{
-				addCarInsert = "insert into carTable values(\"";
-				addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost + "\")";
-		
-				addCarQuery = mysql_query(conn, addCarInsert.c_str());
-	
-					// if the query didn't work ...
-				if (addCarQuery != 0)
-				{
-						// ... explain why ...
-					cout << mysql_error(&mysql) << endl;
-					return;  // ... and exit program
-				}		
-			}
-		
-			else
-			{
-				cout << "Please add manufacturer first" << endl;
-			}
-		}*/
-	}
+	}*/
 }
 
 void addManufacturer(MYSQL &mysql, MYSQL *conn)

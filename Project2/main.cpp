@@ -16,6 +16,7 @@ void addManufacturer(MYSQL &, MYSQL *);
 void addDealer(MYSQL &, MYSQL *);
 void listCars(MYSQL &, MYSQL *, MYSQL_RES *);
 void listDealers(MYSQL &, MYSQL *, MYSQL_RES *);
+void findCars(MYSQL &, MYSQL *, MYSQL_RES *);
 
 
 int main()
@@ -142,8 +143,7 @@ int main()
 			{
 					//find manufacturer if type entered was 'm'
 				case 'm':
-					//findManufacturer();
-					cout << "find manufacturers" << endl;
+					findCars(mysql,conn, res);
 					break;
 			}
 		}
@@ -254,7 +254,7 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	int dealerQuery;	//store dealer query for creating dealer table
 
 		//create "query" for creating a car table
-	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), cost integer, primary key(vin))";
+	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), cost integer, manu char(3), primary key(vin))";
 	cout.flush();
 	
 		//store query into carQuery
@@ -408,7 +408,7 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	else if(totalRowsDealer > 0 && totalRowsManu > 0)
 	{
 		addCarInsert = "insert into carTable values(\"";
-		addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost + "\")";
+		addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost +"\"," + "\"" + manuAbbreviation + "\")";
 		
 		addCarQuery = mysql_query(conn, addCarInsert.c_str());
 	
@@ -573,3 +573,28 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	mysql_free_result(res);
 }
 
+void findCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
+{
+	string manufacturer;
+	string findManufacturer;
+	int manufacturerQuery;
+	
+	cin >> manufacturer;
+	
+	//cout << manufacturer <<endl;
+	
+	findManufacturer = "select manuAbb from manuTable where manu = '" + manufacturer + "\';";
+	manufacturerQuery = mysql_query(conn, findManufacturer.c_str());
+	
+	res = mysql_store_result(conn);
+	
+		//if the query didn't work ...
+	if (manufacturerQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}
+	
+}

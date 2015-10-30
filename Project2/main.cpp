@@ -16,7 +16,8 @@ void addManufacturer(MYSQL &, MYSQL *);
 void addDealer(MYSQL &, MYSQL *);
 void listCars(MYSQL &, MYSQL *, MYSQL_RES *);
 void listDealers(MYSQL &, MYSQL *, MYSQL_RES *);
-void findCars(MYSQL &, MYSQL *, MYSQL_RES *);
+void findCarsManu(MYSQL &, MYSQL *, MYSQL_RES *);
+void findCarsZip(MYSQL &, MYSQL *, MYSQL_RES *);
 
 
 int main()
@@ -143,8 +144,11 @@ int main()
 			{
 					//find manufacturer if type entered was 'm'
 				case 'm':
-					findCars(mysql,conn, res);
+					findCarsManu(mysql, conn, res);
 					break;
+					
+				case 'z':
+					findCarsZip(mysql, conn, res);
 			}
 		}
 		
@@ -284,7 +288,7 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	}
 	
 		//create "query" for creating dealer table
-	dealerTable  = "create table if not exists dealerTable (dealerName char(50), zipCode integer, phoneNumber char(10), primary key(dealerName))";
+	dealerTable  = "create table if not exists dealerTable (dealerName char(50), zipCode integer, phoneNumber char(20), primary key(dealerName))";
 	cout.flush();
 	
 		//store query into dealerQuery
@@ -485,6 +489,7 @@ void addDealer(MYSQL &mysql, MYSQL *conn)
 	string dealerName;
 	string dealerZip;
 	string dealerPhone;
+	string formatDealerPhone;
 	
 	string addDealerInsert;
 	int addDealerQuery;
@@ -493,6 +498,8 @@ void addDealer(MYSQL &mysql, MYSQL *conn)
 	cin >> dealerZip;
 	cin >> dealerPhone;
 	
+	//formatDealerPhone = "[(" + dealerPhone.substr(0,3) + ")" + dealerPhone.substr(3,3) + "-" + dealerPhone.substr(6,4) + "]";
+
 	addDealerInsert = "insert into dealerTable values(\"";
 	addDealerInsert += dealerName + "\"," + "\"" + dealerZip + "\"," + "\"" + dealerPhone + "\")";
 	
@@ -534,7 +541,7 @@ void listCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	{
 		// print out the first 2 colums; they are stored in
 		//    an "array-like" manner
-		cout << row[0] << "  " << row[1] << " " << row[2] << " " << row[3] << endl;
+		cout << row[0] << " " << row[1] << " " << row[2] << " " << row[3] << endl;
 	}
 	
 	mysql_free_result(res);
@@ -567,23 +574,25 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	{
 		// print out the first 2 colums; they are stored in
 		//    an "array-like" manner
-		cout << row[0] << "  " << row[1] << " " << row[2]  << endl;
+		cout << row[0] << " " << row[1] << " " << row[2]  << endl;
 	}
 	
 	mysql_free_result(res);
 }
 
-void findCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
+void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 {
 	string manufacturer;
 	string findManufacturer;
 	int manufacturerQuery;
+	string formatPhone;
+	MYSQL_ROW row;
 	
 	cin >> manufacturer;
 	
 	//cout << manufacturer <<endl;
 	
-	findManufacturer = "select manuAbb from manuTable where manu = '" + manufacturer + "\';";
+	findManufacturer = "select vin, miles, dealer, cost, manuAbb, phoneNumber from manuTable,carTable,dealerTable where manuTable.manu = '" + manufacturer + "\' and manuTable.manuAbb = carTable.manu and carTable.dealer = dealerTable.dealerName;";
 	manufacturerQuery = mysql_query(conn, findManufacturer.c_str());
 	
 	res = mysql_store_result(conn);
@@ -596,5 +605,55 @@ void findCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		
 		return;  // ... and exit program
 	}
+	
+	// go through each line (row) of the answer table
+	for(row=mysql_fetch_row(res);
+		row!=NULL;
+		row=mysql_fetch_row(res))
+	{
+		formatPhone = row[5];
+		// print out the first 2 colums; they are stored in
+		//    an "array-like" manner
+		cout << manufacturer << ": " << row[1] << " miles, $" << row[3] << ": "  
+		     << row[2] << "[(" << formatPhone.substr(0,3) << ")" << formatPhone.substr(3,3) 
+		     << "-" << formatPhone.substr(6,4) << "]" << endl;
+	}
+	mysql_free_result(res);
+}
+
+void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
+{
+	string zipCode;
+	string findCarZip;
+	int findCarZipQuery;
+	MYSQL_ROW row;
+	
+	cin >> zipCode;
+	
+	findCarZip = "select manuAbb, miles, cost, dealerName, phoneNumber from carTable, manuTable, dealerTable where dealerTable.zipCode = '" + zipCode + "\' and dealerTable.dealerName = carTable.dealer and carTable.manu = manuTable.manuAbb;";
+	findCarZipQuery = mysql_query(conn, findCarZip.c_str());
+
+	res = mysql_store_result(conn);
+	
+		//if the query didn't work ...
+	if (findCarZipQuery !=0)
+	{
+			// ... explain why ...
+		cout << mysql_error(&mysql) << endl;
+		
+		return;  // ... and exit program
+	}
+	
+	// go through each line (row) of the answer table
+	for(row=mysql_fetch_row(res);
+		row!=NULL;
+		row=mysql_fetch_row(res))
+	{
+		// print out the first 2 colums; they are stored in
+		//    an "array-like" manner
+		cout << row[0] << ": " << row[1] << " miles, $" << row[2] << ": "  
+		     << row[3] << row[4] <<endl;
+	}
+	mysql_free_result(res);
 	
 }

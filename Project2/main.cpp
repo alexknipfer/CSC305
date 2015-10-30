@@ -274,7 +274,7 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	}
 	
 		//create "query" for creating manufacturer table	
-	manuTable  = "create table if not exists manuTable (manuAbb char(3), manu char(50), primary key(manuAbb))";
+	manuTable  = "create table if not exists manuTable (manuAbb char(3), manuName char(50), primary key(manuAbb))";
 	cout.flush();
 	
 		//store query into manuQuery
@@ -595,7 +595,7 @@ void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	cin >> manufacturer;
 	
 		//get the cars info based on the manufacturer the user entered from table
-	findManufacturer = "select vin, miles, dealer, cost, manuAbb, phoneNumber from manuTable,carTable,dealerTable where manuTable.manu = '" + manufacturer + "\' and manuTable.manuAbb = carTable.manu and carTable.dealer = dealerTable.dealerName;";
+	findManufacturer = "select vin, miles, dealer, cost, manuAbb, phoneNumber from manuTable,carTable,dealerTable where manuTable.manuName = '" + manufacturer + "\' and manuTable.manuAbb = carTable.manu and carTable.dealer = dealerTable.dealerName;";
 	manufacturerQuery = mysql_query(conn, findManufacturer.c_str());
 	
 		//store the result
@@ -637,6 +637,7 @@ void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		//It will list all cars found at a dealer with that zip code
 	
 	string zipCode;			//entered zip code
+	string formatPhone;
 	
 		//the following store the query for finding cars from given zip code
 	string findCarZip;
@@ -648,7 +649,7 @@ void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	cin >> zipCode;
 	
 		//find all cars at a dealer with the zip code that matches the one user entered
-	findCarZip = "select manuAbb, miles, cost, dealerName, phoneNumber from carTable, manuTable, dealerTable where dealerTable.zipCode = '" + zipCode + "\' and dealerTable.dealerName = carTable.dealer and carTable.manu = manuTable.manuAbb;";
+	findCarZip = "select manuAbb, miles, cost, dealerName, phoneNumber, manuName from carTable, manuTable, dealerTable where dealerTable.zipCode = '" + zipCode + "\' and dealerTable.dealerName = carTable.dealer and carTable.manu = manuTable.manuAbb;";
 	findCarZipQuery = mysql_query(conn, findCarZip.c_str());
 
 		//store the query results
@@ -668,10 +669,12 @@ void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		row!=NULL;
 		row=mysql_fetch_row(res))
 	{
+			formatPhone = row[4];
 			//prints out car manufacturer, miles, cost, dealer name, and dealer phone,
 			//the phone number if formatted accordingly [(XXX)XXX-XXXX]
-		cout << row[0] << ": " << row[1] << " miles, $" << row[2] << ": "  
-		     << row[3] << row[4] <<endl;
+		cout << row[5] << ": " << row[1] << " miles, $" << row[2] << ": "  
+		     << row[3] << "[(" << formatPhone.substr(0,3) << ")" << formatPhone.substr(3,3)
+		     << "-" << formatPhone.substr(6,4) << "]" << endl;
 	}
 		//clean up query
 	mysql_free_result(res);

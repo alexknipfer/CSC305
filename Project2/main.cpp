@@ -142,13 +142,15 @@ int main()
 				//determine what to find based on what user entered
 			switch(typeToAdd)
 			{
-					//find manufacturer if type entered was 'm'
+					//find car based on manufacturer if 'm' was entered
 				case 'm':
 					findCarsManu(mysql, conn, res);
 					break;
 					
+					//find car based on dealer zip code if 'z' was entered
 				case 'z':
 					findCarsZip(mysql, conn, res);
+					break;
 			}
 		}
 		
@@ -156,10 +158,6 @@ int main()
 		cout << ">>>";
 		cin >> tag;
 	}
-	
-	
-	
-	
 	
 		//clean up the connection
 	mysql_close(conn);
@@ -249,6 +247,9 @@ string myget_passwd()
 
 int buildMyTables(MYSQL &mysql, MYSQL *conn)
 {
+		//The following function builds the tables necessary for storing
+		//all the data for cars, manufacturers, and dealers
+	
 	string carTable;	//car table
 	string manuTable;	//manufacuter table
 	string dealerTable;	//dealer table
@@ -319,11 +320,12 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	string carCost;			//car cost
 	string manuAbbreviation; //manufacturer from VIN
 	
+		//the following store the query
 	string addCarInsert;
-	int addCarQuery;
+	int addCarQuery;		
 	
-	MYSQL_ROW row;
-	MYSQL_ROW manuRow;
+	MYSQL_ROW row;		//gets row from dealer query
+	MYSQL_ROW manuRow;	//gets row from manufacutrer query
 	
 		//read in VIN, miles, dealer, and cost from user
 	cin >> carVIN;			
@@ -331,11 +333,13 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	cin >> carDealer;
 	cin >> carCost;
 	
-	
+		//get the first 3 characters from car vin for manufacturer abbreviation
 	manuAbbreviation = carVIN.substr(0,3);
 	
+		//get car dealer if it exists
 	string dealersQuery = "select dealerName from dealerTable where dealerName = '"  + carDealer + "\';";
 	int dealerQuery = mysql_query(conn, dealersQuery.c_str());
+	
 			//get the query result(s)
 	res = mysql_store_result(conn);
 	int totalRowsDealer = mysql_num_rows(res);
@@ -350,10 +354,15 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	}
 	
 	//************* The following selects manu abbreviations from manuTable****/
+	
+		//get the manufacturer if it exists
 	string manuQuery = "select manuAbb from manuTable where manuAbb =  '" + manuAbbreviation + "\';";
-
 	int manufacturerQuery = mysql_query(conn,manuQuery.c_str());
+	
+		//store the result
 	res2 = mysql_store_result(conn);
+	
+		//get the row count of the query from the result (will be 0 or 1)
 	int totalRowsManu = mysql_num_rows(res2);
 	manuRow = mysql_fetch_row(res2);
 	
@@ -365,35 +374,40 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 		return;  // ... and exit program
 	}
 	
-	//*************************************************************************/
-
+		//throw a error if neither the manufacturer or dealer exists
 	if (totalRowsDealer == 0 && totalRowsManu == 0)
 	{
 		cout << "Please add a dealer and manufacturer before adding a car" << endl;	
 	}
 	
+		//throw a error if only a dealer doesn't exist
 	else if(totalRowsDealer == 0)
 	{
 		cout << "Please add a dealer first, dealer doesn't exist" << endl;
 	}
 	
+		//throw a error if only a manufacturer doesn't exist
 	else if(totalRowsManu == 0)
 	{
 		cout << "Please add manufacturer first, doesn't exist" << endl;
 	}
 	
+		//throw a error if a dealer exists, but not a manufacturer
 	else if(totalRowsDealer > 0 && totalRowsManu == 0)
 	{
 		cout << "Please add a manufacturer first" <<endl;
 	}
 	
+		//throw a error if a manufacturer exists, but not a dealer
 	else if(totalRowsDealer ==0 && totalRowsManu > 0)
 	{
 		cout << "Please add a dealer first" << endl;
 	}
 	
+		//if the dealer and manufacturer exists, then the car can be added
 	else if(totalRowsDealer > 0 && totalRowsManu > 0)
 	{
+			//insert the car into the table
 		addCarInsert = "insert into carTable values(\"";
 		addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost +"\"," + "\"" + manuAbbreviation + "\")";
 		
@@ -408,6 +422,7 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 		}
 	}
 	
+		//clean up the querys
 	mysql_free_result(res);
 	mysql_free_result(res2);
 }
@@ -416,15 +431,20 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 
 void addManufacturer(MYSQL &mysql, MYSQL *conn)
 {
-	string abbreviation;
-	string manuName;
+		//This function adds a manufacturer to the table manuTable
+		
+	string abbreviation;	//manufacturer abbreviation entered
+	string manuName;		//manufacturer name entered
 	
+		//the following holds the query for inserting the manufacturer
 	string addManuInsert;
 	int addManuQuery;
 	
+		//read in manufacturer abbreviation and name
 	cin >> abbreviation;
 	cin >> manuName;
 	
+		//insert manufactuer into table
 	addManuInsert = "insert into manuTable values(\"";
 	addManuInsert += abbreviation + "\"," + "\"" + manuName + "\")";
 	
@@ -443,17 +463,22 @@ void addManufacturer(MYSQL &mysql, MYSQL *conn)
 
 void addDealer(MYSQL &mysql, MYSQL *conn)
 {
-	string dealerName;
-	string dealerZip;
-	string dealerPhone;
+		//This function adds a dealer to the dealerTable
+	
+	string dealerName;		//dealer name entered
+	string dealerZip;		//dealer's zip code entered
+	string dealerPhone;		//dealer's phone number entered
 
+		//the following holds the query for inserting dealer into table
 	string addDealerInsert;
 	int addDealerQuery;
 	
+		//read in dealer name, zip code, and phone number
 	cin >> dealerName;
 	cin >> dealerZip;
 	cin >> dealerPhone;
 	
+		//insert dealer info into the dealer table
 	addDealerInsert = "insert into dealerTable values(\"";
 	addDealerInsert += dealerName + "\"," + "\"" + dealerZip + "\"," + "\"" + dealerPhone + "\")";
 	
@@ -472,13 +497,19 @@ void addDealer(MYSQL &mysql, MYSQL *conn)
 
 void listCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 {
-	string allCars;
-	int allCarsQuery;
-	MYSQL_ROW row;
+		//This function lists all cars that have been added by the user
 	
+		//the following holds the query for getting all cars from table
+	string allCars;
+	int allCarsQuery;	
+	
+	MYSQL_ROW row;		//retrieves row from query
+	
+		//get all cars from table
 	allCars = "select * from carTable;";
 	allCarsQuery = mysql_query(conn,allCars.c_str());
 	
+		//store the query result
 	res = mysql_store_result(conn);
 
 		//if the query didn't work ...
@@ -500,6 +531,7 @@ void listCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		cout << row[0] << " " << row[1] << " " << row[2] << " " << row[3] << endl;
 	}
 	
+		//clean up query
 	mysql_free_result(res);
 }
 
@@ -507,13 +539,19 @@ void listCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 
 void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 {
+		//This function lists all dealers added by user
+	
+		//the following holds the query for getting dealers
 	string allDealers;
 	int allDealersQuery;
-	MYSQL_ROW row;
 	
+	MYSQL_ROW row;		//gets row(s) from query
+	
+		//get all dealers from table
 	allDealers = "select * from dealerTable;";
 	allDealersQuery = mysql_query(conn, allDealers.c_str());
 	
+		//store the result
 	res = mysql_store_result(conn);
 	
 		//if the query didn't work ...
@@ -525,16 +563,16 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		return;  // ... and exit program
 	}
 	
-	// go through each line (row) of the answer table
+		// go through each line (row) of the answer table to get all dealers
 	for(row=mysql_fetch_row(res);
 		row!=NULL;
 		row=mysql_fetch_row(res))
 	{
-		// print out the first 2 colums; they are stored in
-		//    an "array-like" manner
+			//print out dealer name, dealer zip code, and dealer phone number
 		cout << row[0] << " " << row[1] << " " << row[2]  << endl;
 	}
 	
+		//clean up query
 	mysql_free_result(res);
 }
 
@@ -542,17 +580,25 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 
 void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 {
-	string manufacturer;
-	string findManufacturer;
-	int manufacturerQuery;
-	string formatPhone;
-	MYSQL_ROW row;
+		//This function finds and prints all cars given a manufacturer name
+		
+	string manufacturer;		//manufacturer entered
 	
+		//the following store the query for finding the cars
+	string findManufacturer;	
+	int manufacturerQuery;
+	
+	string formatPhone;		//formatted phone number
+	MYSQL_ROW row;			//rows given from query
+	
+		//read in the manufacturer user wants to search by
 	cin >> manufacturer;
 	
+		//get the cars info based on the manufacturer the user entered from table
 	findManufacturer = "select vin, miles, dealer, cost, manuAbb, phoneNumber from manuTable,carTable,dealerTable where manuTable.manu = '" + manufacturer + "\' and manuTable.manuAbb = carTable.manu and carTable.dealer = dealerTable.dealerName;";
 	manufacturerQuery = mysql_query(conn, findManufacturer.c_str());
 	
+		//store the result
 	res = mysql_store_result(conn);
 	
 		//if the query didn't work ...
@@ -569,13 +615,17 @@ void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		row!=NULL;
 		row=mysql_fetch_row(res))
 	{
+			//store the "pointer" in a string so it can be formatted
 		formatPhone = row[5];
-		// print out the first 2 colums; they are stored in
-		//    an "array-like" manner
+		
+			//print out the car info which includes manufacturer, car miles, 
+			//phone number formatted accordingly [(XXX)XXX-XXXX]
 		cout << manufacturer << ": " << row[1] << " miles, $" << row[3] << ": "  
 		     << row[2] << "[(" << formatPhone.substr(0,3) << ")" << formatPhone.substr(3,3) 
 		     << "-" << formatPhone.substr(6,4) << "]" << endl;
 	}
+	
+		//clean up query
 	mysql_free_result(res);
 }
 
@@ -583,16 +633,25 @@ void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 
 void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 {
-	string zipCode;
+		//This function finds a car given a zip code from user
+		//It will list all cars found at a dealer with that zip code
+	
+	string zipCode;			//entered zip code
+	
+		//the following store the query for finding cars from given zip code
 	string findCarZip;
 	int findCarZipQuery;
-	MYSQL_ROW row;
 	
+	MYSQL_ROW row;		//row that holds query results
+	
+		//read in zip code
 	cin >> zipCode;
 	
+		//find all cars at a dealer with the zip code that matches the one user entered
 	findCarZip = "select manuAbb, miles, cost, dealerName, phoneNumber from carTable, manuTable, dealerTable where dealerTable.zipCode = '" + zipCode + "\' and dealerTable.dealerName = carTable.dealer and carTable.manu = manuTable.manuAbb;";
 	findCarZipQuery = mysql_query(conn, findCarZip.c_str());
 
+		//store the query results
 	res = mysql_store_result(conn);
 	
 		//if the query didn't work ...
@@ -609,11 +668,11 @@ void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		row!=NULL;
 		row=mysql_fetch_row(res))
 	{
-		// print out the first 2 colums; they are stored in
-		//    an "array-like" manner
+			//prints out car manufacturer, miles, cost, dealer name, and dealer phone,
+			//the phone number if formatted accordingly [(XXX)XXX-XXXX]
 		cout << row[0] << ": " << row[1] << " miles, $" << row[2] << ": "  
 		     << row[3] << row[4] <<endl;
 	}
+		//clean up query
 	mysql_free_result(res);
-	
 }

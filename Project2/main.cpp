@@ -170,6 +170,8 @@ int main()
 
 char mygetch()
 {
+	//This function came from your "UNIX" connector file from PCCommon
+	
   struct termios oldt, newt;
   int ch;
 
@@ -259,7 +261,8 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	int dealerQuery;	//store dealer query for creating dealer table
 
 		//create "query" for creating a car table
-	carTable  = "create table if not exists carTable (vin char(100), miles integer, dealer char(50), cost integer, manu char(3), primary key(vin))";
+	carTable  = "create table if not exists carTable (vin char(100), miles integer, ";
+	carTable += "dealer char(50), cost integer, manu char(3), primary key(vin))";
 	cout.flush();
 	
 		//store query into carQuery
@@ -274,7 +277,8 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	}
 	
 		//create "query" for creating manufacturer table	
-	manuTable  = "create table if not exists manuTable (manuAbb char(3), manuName char(50), primary key(manuAbb))";
+	manuTable  = "create table if not exists manuTable (manuAbb char(3), ";
+	manuTable += "manuName char(50), primary key(manuAbb))";
 	cout.flush();
 	
 		//store query into manuQuery
@@ -289,7 +293,8 @@ int buildMyTables(MYSQL &mysql, MYSQL *conn)
 	}
 	
 		//create "query" for creating dealer table
-	dealerTable  = "create table if not exists dealerTable (dealerName char(50), zipCode integer, phoneNumber char(20), primary key(dealerName))";
+	dealerTable  = "create table if not exists dealerTable (dealerName char(50),";
+	dealerTable += " zipCode integer, phoneNumber char(20), primary key(dealerName))";
 	cout.flush();
 	
 		//store query into dealerQuery
@@ -409,7 +414,9 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	{
 			//insert the car into the table
 		addCarInsert = "insert into carTable values(\"";
-		addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"" + carDealer + "\"," + "\"" + carCost +"\"," + "\"" + manuAbbreviation + "\")";
+		addCarInsert += carVIN + "\"," + "\"" + carMiles + "\"," + "\"";
+		addCarInsert += carDealer + "\"," + "\"" + carCost +"\"," + "\"";
+		addCarInsert += manuAbbreviation + "\")";
 		
 		addCarQuery = mysql_query(conn, addCarInsert.c_str());
 	
@@ -480,7 +487,8 @@ void addDealer(MYSQL &mysql, MYSQL *conn)
 	
 		//insert dealer info into the dealer table
 	addDealerInsert = "insert into dealerTable values(\"";
-	addDealerInsert += dealerName + "\"," + "\"" + dealerZip + "\"," + "\"" + dealerPhone + "\")";
+	addDealerInsert += dealerName + "\"," + "\"" + dealerZip + "\"," + "\"";
+	addDealerInsert += dealerPhone + "\")";
 	
 	addDealerQuery = mysql_query(conn, addDealerInsert.c_str());
 	
@@ -595,7 +603,11 @@ void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	cin >> manufacturer;
 	
 		//get the cars info based on the manufacturer the user entered from table
-	findManufacturer = "select vin, miles, dealer, cost, manuAbb, phoneNumber from manuTable,carTable,dealerTable where manuTable.manuName = '" + manufacturer + "\' and manuTable.manuAbb = carTable.manu and carTable.dealer = dealerTable.dealerName;";
+	findManufacturer = "select vin, miles, dealer, cost, manuAbb, phoneNumber ";
+	findManufacturer += "from manuTable,carTable,dealerTable where manuTable.manuName = '";
+	findManufacturer += manufacturer + "\' and manuTable.manuAbb = carTable.manu ";
+	findManufacturer += "and carTable.dealer = dealerTable.dealerName;";
+	
 	manufacturerQuery = mysql_query(conn, findManufacturer.c_str());
 	
 		//store the result
@@ -649,7 +661,11 @@ void findCarsZip(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	cin >> zipCode;
 	
 		//find all cars at a dealer with the zip code that matches the one user entered
-	findCarZip = "select manuAbb, miles, cost, dealerName, phoneNumber, manuName from carTable, manuTable, dealerTable where dealerTable.zipCode = '" + zipCode + "\' and dealerTable.dealerName = carTable.dealer and carTable.manu = manuTable.manuAbb;";
+	findCarZip = "select manuAbb, miles, cost, dealerName, phoneNumber, ";
+	findCarZip += "manuName from carTable, manuTable, dealerTable where dealerTable.zipCode = '";
+	findCarZip += zipCode + "\' and dealerTable.dealerName = carTable.dealer ";
+	findCarZip += "and carTable.manu = manuTable.manuAbb;";
+	
 	findCarZipQuery = mysql_query(conn, findCarZip.c_str());
 
 		//store the query results

@@ -4,6 +4,7 @@
 #include <mysql.h>
 #include <termios.h>
 #include <curses.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -347,6 +348,10 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	
 			//get the query result(s)
 	res = mysql_store_result(conn);
+	
+		//get the row count of the query from the result (will be 0 or 1)
+		//if the result is 0, that means the dealer doesn't exist
+		//if the result is 1, that means the dealer was found
 	int totalRowsDealer = mysql_num_rows(res);
 	
 		//if the query didn't work ...
@@ -368,6 +373,8 @@ void addCar(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res, MYSQL_RES *res2)
 	res2 = mysql_store_result(conn);
 	
 		//get the row count of the query from the result (will be 0 or 1)
+		//if the result is 0, that means the manufacturer doesn't exist
+		//if the result is 1, then the manufacturer does exist
 	int totalRowsManu = mysql_num_rows(res2);
 	manuRow = mysql_fetch_row(res2);
 	
@@ -455,6 +462,7 @@ void addManufacturer(MYSQL &mysql, MYSQL *conn)
 	addManuInsert = "insert into manuTable values(\"";
 	addManuInsert += abbreviation + "\"," + "\"" + manuName + "\")";
 	
+		//send query
 	addManuQuery = mysql_query(conn, addManuInsert.c_str());
 	
 		// if the query didn't work ...
@@ -490,6 +498,7 @@ void addDealer(MYSQL &mysql, MYSQL *conn)
 	addDealerInsert += dealerName + "\"," + "\"" + dealerZip + "\"," + "\"";
 	addDealerInsert += dealerPhone + "\")";
 	
+		//send query
 	addDealerQuery = mysql_query(conn, addDealerInsert.c_str());
 	
 		// if the query didn't work ...
@@ -515,6 +524,8 @@ void listCars(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	
 		//get all cars from table
 	allCars = "select * from carTable;";
+	
+		//send query
 	allCarsQuery = mysql_query(conn,allCars.c_str());
 	
 		//store the query result
@@ -557,6 +568,8 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	
 		//get all dealers from table
 	allDealers = "select * from dealerTable;";
+	
+		//send query
 	allDealersQuery = mysql_query(conn, allDealers.c_str());
 	
 		//store the result
@@ -577,7 +590,7 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		row=mysql_fetch_row(res))
 	{
 			//print out dealer name, dealer zip code, and dealer phone number
-		cout << row[0] << " " << row[1] << " " << row[2]  << endl;
+		cout << row[0] << " " << setw(20) << row[1] << " " << row[2]  << endl;
 	}
 	
 		//clean up query
@@ -608,6 +621,7 @@ void findCarsManu(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 	findManufacturer += manufacturer + "\' and manuTable.manuAbb = carTable.manu ";
 	findManufacturer += "and carTable.dealer = dealerTable.dealerName;";
 	
+		//send query
 	manufacturerQuery = mysql_query(conn, findManufacturer.c_str());
 	
 		//store the result

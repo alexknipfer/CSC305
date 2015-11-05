@@ -4,7 +4,6 @@
 #include <mysql.h>
 #include <termios.h>
 #include <curses.h>
-#include <iomanip>
 
 using namespace std;
 
@@ -590,7 +589,7 @@ void listDealers(MYSQL &mysql, MYSQL *conn, MYSQL_RES *res)
 		row=mysql_fetch_row(res))
 	{
 			//print out dealer name, dealer zip code, and dealer phone number
-		cout << row[0] << " " << setw(20) << row[1] << " " << row[2]  << endl;
+		cout << row[0] << " " << row[1] << " " << row[2]  << endl;
 	}
 	
 		//clean up query

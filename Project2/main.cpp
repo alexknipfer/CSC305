@@ -47,17 +47,17 @@ int main()
 	db_name = "alexknipfer";
 
 		//get user credentials and mysql server info
-	/*cout << "Enter MySQL database hostname (or IP adress):";
+/*	cout << "Enter MySQL database hostname (or IP adress):";
 	cin >> db_host;
 
 	cout << "Enter MySQL database username (also the database name):";
 	cin >> db_user;
 
 	cout << "Enter MySQL database password:";
-	db_password=myget_passwd();*/
+	db_password=myget_passwd();
 
 		//could also prompt for this, if desired
-	db_name = db_user;
+	db_name = db_user;*/
 
 		//go out and connect to the mysql server
 	cout << "Connecting to remote DB ..."; 

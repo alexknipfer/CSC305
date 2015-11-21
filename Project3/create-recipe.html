@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Main Menu</title>
+    <title>Create Recipe</title>
 
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
@@ -19,14 +19,21 @@
             <div class="card grey lighten-5">
                 <div class="card-content black-text">
                     
-                    <span class="card-title black-text">Main Menu</span>
+                    <span class="card-title black-text">Create Recipe</span>
                     
-                    <ul>
-                        <li><a href="create-recipe.html">Create a recipe or add ingredient to a recipe</a></li>
-                        <li><a href="list-recipe.html">List a recipe's ingredients</a></li>
-                        <li><a href="buy-recipe.html">Buy all recipe ingredients from the store</a></li>
-                        <li><a href="add-ingredient.html">Add ingredients to the store</a></li>
-                    </ul>
+                    <form method="post" action="create-recipe.php">
+                        <label>Recipe Name</label>
+                        <input type="text" name="recipeName">
+                        
+                        <label>Ingredient Name</label>
+                        <input type="text" name="ingredientName">
+
+                        <label>Quantity of Ingredient Required</label>
+                        <input type="text" name="ingredientQuantity">
+
+                        <button type="submit" class="waves-effect waves-light btn">Create Recipe!</button>
+
+                    </form>
     
                 </div>
             </div>

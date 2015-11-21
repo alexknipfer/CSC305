@@ -1,9 +1,15 @@
 <?php
-
+    session_start();
+    
     $servername = $_POST['servername'];
     $databaseName = $_POST['dbname'];
     $username = $_POST['username'];
     $password = $_POST['password'];
+    
+    $_SESSION["servername"] = $servername;
+    $_SESSION["databaseName"] = $databaseName;
+    $_SESSION["username"] = $username;
+    $_SESSION["password"] = $password;
 
 
     // Create connection
@@ -28,7 +34,5 @@
         
         header("Location: main.html");
     }
-    
-    //echo "Connected successfully";
     
 ?>

@@ -1,7 +1,6 @@
 <?php
     session_start();
  
-    $recipeName = $_POST['recipeName'];
     $ingredientName = $_POST['ingredientName'];
     $ingredientQuantity = $_POST['ingredientQuantity'];
 
@@ -15,19 +14,20 @@
     }
     
     else{
-        $addRecipe = "insert into Recipes (RecipeName, Ingredient, Quantity) values ('$recipeName', '$ingredientName', '$ingredientQuantity')";
+        $addIngredient = "insert into Inventory (Ingredient, Quantity) values ('$ingredientName', '$ingredientQuantity')
+        on duplicate key update Quantity = Quantity + '$ingredientQuantity';";
 
-        $result = mysqli_query($conn, $addRecipe);
+        $result = mysqli_query($conn, $addIngredient);
 
         if(!$result)
         {
-            echo "<script>alert('Recipe NOT added successfully');
+            echo "<script>alert('Ingredient NOT added successfully');
             window.location.href='main.html';</script>";
         }
         
         else
         {
-            echo "<script>alert('Recipe added successfully');
+            echo "<script>alert('Ingredient added successfully');
             window.location.href='main.html';</script>";
         }
 

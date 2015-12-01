@@ -27,7 +27,7 @@
         $result = mysqli_query($conn, $recipeTable);
         
         $inventoryTable = "create table if not exists Inventory (Ingredient varchar(100), ";
-        $inventoryTable .= "Quantity int)";
+        $inventoryTable .= "Quantity int, primary key(Ingredient))";
         
         $result = mysqli_query($conn, $inventoryTable);
         

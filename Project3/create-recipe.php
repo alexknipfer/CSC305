@@ -28,7 +28,7 @@
         else
         {
             echo "<script>alert('Recipe added successfully');
-            window.location.href='main.html';</script>";
+            window.location.href='create-recipe.html';</script>";
         }
 
         

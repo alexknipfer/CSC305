@@ -22,13 +22,13 @@
         if(!$result)
         {
             echo "<script>alert('Ingredient NOT added successfully');
-            window.location.href='main.html';</script>";
+            window.location.href='add-ingredient.html';</script>";
         }
         
         else
         {
             echo "<script>alert('Ingredient added successfully');
-            window.location.href='main.html';</script>";
+            window.location.href='add-ingredient.html';</script>";
         }
 
         
